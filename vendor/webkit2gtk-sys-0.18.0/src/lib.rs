@@ -18,7 +18,7 @@ use glib_sys as glib;
 use gobject_sys as gobject;
 use gtk_sys as gtk;
 use javascriptcore_rs_sys as java_script_core;
-use soup_sys as soup;
+use soup3_sys as soup;
 
 #[allow(unused_imports)]
 use libc::{
@@ -3094,8 +3094,8 @@ impl ::std::fmt::Debug for WebKitPermissionRequest {
   }
 }
 
-#[link(name = "webkit2gtk-4.0")]
-#[link(name = "javascriptcoregtk-4.0")]
+#[link(name = "webkit2gtk-4.1")]
+#[link(name = "javascriptcoregtk-4.1")]
 extern "C" {
 
   //=========================================================================
