@@ -2,7 +2,10 @@
 # All downloaded tools and Cargo caches remain inside work/.
 POT_ROOT="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 POT_SYSROOT="$POT_ROOT/work/sysroot"
-export PATH="$POT_SYSROOT/usr/bin:$POT_SYSROOT/usr/lib/cargo/bin:$POT_SYSROOT/usr/lib/rust-1.93/bin:$PATH"
+export PATH="$POT_ROOT/work/bin:$POT_SYSROOT/usr/bin:$POT_SYSROOT/usr/lib/cargo/bin:$POT_SYSROOT/usr/lib/rust-1.93/bin:$PATH"
+export COMPILER_PATH="$POT_SYSROOT/usr/libexec/gcc/x86_64-linux-gnu/15:/usr/libexec/gcc/x86_64-linux-gnu/15"
+export CPATH="$POT_SYSROOT/usr/include/x86_64-linux-gnu:$POT_SYSROOT/usr/include${CPATH:+:$CPATH}"
+export CARGO_BUILD_JOBS=2
 export LD_LIBRARY_PATH="$POT_SYSROOT/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export LIBRARY_PATH="$POT_SYSROOT/usr/lib/x86_64-linux-gnu${LIBRARY_PATH:+:$LIBRARY_PATH}"
 export PKG_CONFIG_PATH="$POT_SYSROOT/usr/lib/x86_64-linux-gnu/pkgconfig:$POT_SYSROOT/usr/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
