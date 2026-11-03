@@ -52,3 +52,17 @@
   AppIndicator registration/menu activation, and shortcut-triggered window creation.
   Bing auth returned HTTP 404 and Google HTTP 429; these are recorded as failed
   external-service checks rather than claimed as successful translations.
+
+## 2026-11-04 — native Wayland foreground applications and shortcuts
+- User reported Ctrl+T did not trigger in Firefox/PDF. Earlier X11 registration
+  and synthetic-key tests did not cover native Wayland foreground applications.
+- Added an optional per-user GNOME shortcut installer and a Python standard-library
+  client for existing Pot local actions. No framework migration, system security
+  changes, old libraries or application API changes are needed.
+- Installer backs up its binding, preserves other custom bindings, checks obvious
+  Ctrl+T conflicts, and supports guarded removal. Helper reads the configured port,
+  sends no selected text, and only retries connection refusals to avoid duplicates.
+- Four local HTTP action routes passed an isolated fixture test. Current user's
+  binding was installed and independently read back; live Pot listener probe passed.
+- User physically tested Ctrl+T in the reported Firefox/PDF scenario and confirmed
+  Pot opens with selected text. External translation service results were not tested.
