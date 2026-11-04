@@ -79,3 +79,18 @@
   User physically tested Ctrl+T and confirmed foreground activation with selected
   text. Another reboot has not yet been tested.
 - Previous deployed helper preserved as pot-shortcut.before-activation.py.
+
+## 2026-11-04 — native Wayland selection capture
+- Corrected stale selection capture: a focused native Wayland GTK child receives
+  PRIMARY, then the parent posts UTF-8 text to Pot's existing /translate endpoint.
+  Captures once per invocation and retains it when starting Pot after refusal.
+  Keeps the verified EWMH activation fix. No X11 PRIMARY fallback on Wayland.
+- User confirmed ordinary Firefox webpage selection works. Zotero 10.0.7 PDF
+  ordinary selection does not publish PRIMARY reliably; user confirmed Alt-drag
+  then Ctrl+T works, matching Zotero's documented issue/workaround.
+- Failed experiments (focus before X11 capture and AT-SPI) were removed. Temporary
+  gtk-enable-primary-paste change was reset to its original default false.
+- Pot SIGSEGV occurred during the experiments. No stack trace was available; its
+  cause is unresolved. Report-generation memory warning is not proof of OOM.
+- Selected text is never logged. No framework/system package/security changes.
+  Final physical-key tests passed, but another reboot and crash fix are unverified.

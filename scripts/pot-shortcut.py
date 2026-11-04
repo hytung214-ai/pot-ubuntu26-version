@@ -127,21 +127,108 @@ def call_action(port, action):
         connection.close()
 
 
+def read_wayland_selection():
+    """Receive the primary offer on a focused native Wayland GTK surface."""
+    os.environ['GDK_BACKEND'] = 'wayland'
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk, Gdk, GLib
+    ok, _ = Gtk.init_check([])
+    if not ok or type(Gdk.Display.get_default()).__name__ != 'GdkWaylandDisplay':
+        raise RuntimeError('Native Wayland display unavailable')
+    window = Gtk.Window(title='Pot selection reader')
+    window.set_decorated(False)
+    window.set_default_size(2, 2)
+    window.set_skip_taskbar_hint(True)
+    window.set_skip_pager_hint(True)
+    window.set_opacity(.01)
+    if os.environ.get('DESKTOP_STARTUP_ID'):
+        window.set_startup_id(os.environ['DESKTOP_STARTUP_ID'])
+    clipboard = Gtk.Clipboard.get(Gdk.SELECTION_PRIMARY)
+    result = []
+    requested = [False]
+
+    def received(_clipboard, value, _data):
+        if value and value.strip():
+            result.append(value)
+            Gtk.main_quit()
+
+    def request():
+        clipboard.request_text(received, None)
+        return False
+
+    def focused(_window, _event):
+        if not requested[0]:
+            requested[0] = True
+            GLib.timeout_add(150, request)
+        return False
+
+    window.connect('focus-in-event', focused)
+    window.show_all()
+    window.present()
+    GLib.timeout_add(2500, lambda: Gtk.main_quit() or False)
+    Gtk.main()
+    window.destroy()
+    if not result:
+        raise RuntimeError('No native Wayland primary selection received')
+    return result[0]
+
+
+def native_selection():
+    # Keep GTK's Wayland backend isolated from the X11 activation code.
+    env = dict(os.environ, GDK_BACKEND='wayland')
+    child = subprocess.run(['/usr/bin/python3', str(Path(__file__).resolve()),
+                            '--read-wayland-selection'], env=env, capture_output=True,
+                           text=True, timeout=5)
+    if child.returncode != 0 or not child.stdout.strip():
+        raise RuntimeError('Native Wayland selection unavailable; no X11 fallback was used')
+    return child.stdout
+
+
+def send_text(port, text):
+    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=8)
+    try:
+        connection.request('POST', '/translate', body=text.encode('utf-8'),
+                           headers={'Content-Type': 'text/plain; charset=utf-8'})
+        response = connection.getresponse()
+        if response.status != 200 or response.read(128).strip() != b'ok':
+            raise RuntimeError(f'Unexpected local Pot response: HTTP {response.status}')
+    finally:
+        connection.close()
+
+
+def invoke_action(port, action, selection_text=None):
+    if action == 'selection' and os.environ.get('XDG_SESSION_TYPE') == 'wayland':
+        if selection_text is None:
+            raise RuntimeError('Current selection must be captured before invoking Pot')
+        send_text(port, selection_text)
+    else:
+        call_action(port, action)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('action', choices=ACTIONS, nargs='?', default='selection')
     parser.add_argument('--probe', action='store_true', help='Check the local listener without opening windows')
     parser.add_argument('--log', type=Path)
+    parser.add_argument('--read-wayland-selection', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     try:
+        if args.read_wayland_selection:
+            sys.stdout.write(read_wayland_selection())
+            return 0
         port = pot_port()
         if args.probe:
             with socket.create_connection(('127.0.0.1', port), timeout=2):
                 pass
             print(f'Pot local listener is reachable on 127.0.0.1:{port}')
             return 0
+        selection_text = None
+        if args.action == 'selection' and os.environ.get('XDG_SESSION_TYPE') == 'wayland':
+            selection_text = native_selection()
+            log_event(args.log, 'selection source: focused native Wayland surface')
         try:
-            call_action(port, args.action)
+            invoke_action(port, args.action, selection_text)
         except ConnectionRefusedError:
             # Only retry a connection refusal. Do not repeat requests that timed
             # out after acceptance, which could duplicate paid translations.
@@ -150,7 +237,7 @@ def main():
             for attempt in range(50):
                 time.sleep(.1)
                 try:
-                    call_action(port, args.action)
+                    invoke_action(port, args.action, selection_text)
                     break
                 except ConnectionRefusedError:
                     if attempt == 49:
@@ -168,6 +255,10 @@ def main():
         message = f'{args.action}: {type(error).__name__}: {error}'
         log_event(args.log, message)
         print(message, file=sys.stderr)
+        if not args.read_wayland_selection and args.action == 'selection' and shutil.which('notify-send'):
+            subprocess.run(['notify-send', '--app-name=Pot', 'Pot 划词调用失败',
+                            '请重新选择文字后重试；Zotero PDF 请按住 Alt 拖选。'], timeout=3, check=False,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return 1
 
 
