@@ -66,3 +66,16 @@
   binding was installed and independently read back; live Pot listener probe passed.
 - User physically tested Ctrl+T in the reported Firefox/PDF scenario and confirmed
   Pot opens with selected text. External translation service results were not tested.
+
+## 2026-11-04 — explicit foreground activation after shortcut requests
+- After reboot, GNOME binding persisted and Pot accepted shortcut HTTP requests,
+  but its visible Translate window only demanded attention behind other apps.
+  User confirmed the window was obscured.
+- Helper now sends an EWMH activation request for the matching Pot Translate
+  window after a selection/input action, then verifies the active window.
+  This is a direct user action; no always-on-top or compositor security settings
+  are changed. Existing xprop/libX11 are used, no packages installed.
+- Real session activation probe and deployed input action both verified success.
+  User physically tested Ctrl+T and confirmed foreground activation with selected
+  text. Another reboot has not yet been tested.
+- Previous deployed helper preserved as pot-shortcut.before-activation.py.
