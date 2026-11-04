@@ -123,3 +123,8 @@
   passed. Separate GTK client read the Unicode selection and confirmed unchanged
   CLIPBOARD baseline. Test calls the actual handler; full PDF drag remains pending
   physical user validation. Rejected artifacts retained in a separate subfolder.
+
+- Final user validation: version 0.1.1 installed successfully in the daily Zotero
+  profile; ordinary PDF drag-selection followed by Ctrl+T now displays the correct
+  text without Alt. Annotation editing and another reboot were not separately
+  tested. No claim is made that the unrelated Pot SIGSEGV is resolved.

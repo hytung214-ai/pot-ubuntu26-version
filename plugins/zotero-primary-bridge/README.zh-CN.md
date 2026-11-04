@@ -23,7 +23,7 @@
 - manifest 限定 10.0.*，没有宣称其他版本已经验证。
 - Node 合约测试已通过：只写 PRIMARY、Unicode/多行文字、选区弹窗参数不变、忽略空值、停用清理、平台错误隔离、Linux 限制、异步启动取消。
 - 真实 Zotero 10.0.7 的隔离配置测试通过：实际加载 bootstrap、注册选区事件、通过 XPCOM 写入 PRIMARY、外部 GTK 客户端读回 Unicode 文字，同时验证正常 CLIPBOARD 的基线内容未改变。测试程序 scripts/test-zotero-primary-runtime.py。
-- 该隔离测试主动调用真实事件处理器，尚未自动模拟 PDF 拖选。日常资料库的实际拖选和批注仍等待用户确认。
+- 该隔离测试主动调用真实事件处理器，未自动模拟 PDF 拖选。用户随后在日常 Zotero 中安装 0.1.1，确认普通拖选 PDF 文字后按 Ctrl+T 已正常显示，无需 Alt。批注编辑回归和再次重启尚未单独测试。
 - 0.1.0 被拒绝是因为清单缺少 Zotero 强制要求的 update_url。0.1.1 补齐该字段，不放宽兼容性或关闭安全校验。此插件仅手动更新，update_url 使用保留的 updates.invalid 域名表示没有在线更新服务；不要期待自动更新。
 
 源码：plugins/zotero-primary-bridge，独立分支 compat/zotero-primary-bridge。
