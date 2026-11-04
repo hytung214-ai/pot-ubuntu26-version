@@ -94,3 +94,17 @@
   cause is unresolved. Report-generation memory warning is not proof of OOM.
 - Selected text is never logged. No framework/system package/security changes.
   Final physical-key tests passed, but another reboot and crash fix are unverified.
+
+## 2026-11-04 — optional Zotero PRIMARY synchronization add-on
+- Added plugins/zotero-primary-bridge on a separate branch. The installed Zotero
+  10.0.7 reader.js exposes renderTextSelectionPopup with annotation.text.
+- Bootstrap add-on publishes this explicit PDF text selection via
+  nsIClipboardHelper.copyStringToClipboard(..., kSelectionClipboard). It never
+  writes CLIPBOARD, changes annotations or calls a network/translation service.
+- Handles uninstall/disable through listener removal; errors cannot interrupt the
+  selection popup. Manifest bounds compatibility to Zotero 10.0.*.
+- Node contract tests cover PRIMARY targeting, Unicode, annotation preservation,
+  empty selections, platform errors, shutdown and startup cancellation. XPI archive
+  and embedded sources verified; package/source/checksums delivered separately.
+- Runtime installation and ordinary-drag + Ctrl+T validation remain pending user
+  feedback. The Alt-drag workaround is retained until this is confirmed.
