@@ -8,7 +8,7 @@
 
 1. Zotero 菜单：工具 → 插件（Tools → Plugins，某些版本称附加组件）。
 2. 点击插件管理页面的齿轮 → 从文件安装插件。
-3. 选择本目录的 pot-zotero-primary-bridge-0.1.0.xpi，确认安装。
+3. 选择本目录的 pot-zotero-primary-bridge-0.1.1.xpi，确认安装。
 4. 回到 PDF，普通拖选一小段文字，松开鼠标，再按 Ctrl+T。
 
 使用前请确保 Pot 的 GNOME 快捷键及原生 Wayland 辅助脚本仍在。插件名称为 Pot Primary Selection Bridge。安装通常可以立即生效；如没有变化，可关闭 PDF 标签页后重新打开，不需要修改系统设置。
@@ -22,7 +22,9 @@
 - 当前宿主：Zotero 10.0.7；读取已安装程序的 reader.js，确认事件、参数和注册/注销 API。
 - manifest 限定 10.0.*，没有宣称其他版本已经验证。
 - Node 合约测试已通过：只写 PRIMARY、Unicode/多行文字、选区弹窗参数不变、忽略空值、停用清理、平台错误隔离、Linux 限制、异步启动取消。
-- 实际 Zotero 中的选区发布、批注和正常 Ctrl+C 尚待用户安装后验证；此包不是已通过全部实机测试的发行版。
+- 真实 Zotero 10.0.7 的隔离配置测试通过：实际加载 bootstrap、注册选区事件、通过 XPCOM 写入 PRIMARY、外部 GTK 客户端读回 Unicode 文字，同时验证正常 CLIPBOARD 的基线内容未改变。测试程序 scripts/test-zotero-primary-runtime.py。
+- 该隔离测试主动调用真实事件处理器，尚未自动模拟 PDF 拖选。日常资料库的实际拖选和批注仍等待用户确认。
+- 0.1.0 被拒绝是因为清单缺少 Zotero 强制要求的 update_url。0.1.1 补齐该字段，不放宽兼容性或关闭安全校验。此插件仅手动更新，update_url 使用保留的 updates.invalid 域名表示没有在线更新服务；不要期待自动更新。
 
 源码：plugins/zotero-primary-bridge，独立分支 compat/zotero-primary-bridge。
 

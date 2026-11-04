@@ -108,3 +108,18 @@
   and embedded sources verified; package/source/checksums delivered separately.
 - Runtime installation and ordinary-drag + Ctrl+T validation remain pending user
   feedback. The Alt-drag workaround is retained until this is confirmed.
+
+## 2026-11-04 — Zotero add-on installation manifest correction
+- User installation rejected version 0.1.0. Installed Extension.sys.mjs explicitly
+  requires applications.zotero.update_url; this field was missing. Version bounds
+  were correct and remain 10.0 through 10.0.*.
+- Version 0.1.1 supplies the required HTTPS update field using the reserved
+  updates.invalid domain. This is a local, manually updated add-on, without an
+  online update feed; no safety or compatibility checks are disabled.
+- Added real runtime verification on Zotero 10.0.7 in a new disposable profile,
+  data directory, Xvfb display and private D-Bus. Only that test bus has AppArmor
+  mediation disabled; host configuration and the user's library are untouched.
+- Actual bootstrap load, reader listener registration and XPCOM PRIMARY write
+  passed. Separate GTK client read the Unicode selection and confirmed unchanged
+  CLIPBOARD baseline. Test calls the actual handler; full PDF drag remains pending
+  physical user validation. Rejected artifacts retained in a separate subfolder.
